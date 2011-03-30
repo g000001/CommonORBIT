@@ -1,0 +1,553 @@
+Documentation for file /usr/users/desmedt/lisp/corbit/corbit.lisp
+   (definitions of exported symbols only)
+   Friday 8 January 1993  10:55:04
+
+Provides module CORBIT
+
+Defines package CORBIT
+
+In package CORBIT
+
+<<  object = &rest path
+     [Macro]
+   Synonym of WHERE.
+
+>>  object &rest functions
+     [Macro]
+   Function composition in reverse order. The function names are not
+   evaluated. Example:
+     (>> 'PAUL WIFE OCCUPATION) == (OCCUPATION (WIFE 'PAUL))
+
+A  &rest proxies-and-aspects
+     [Macro]
+   Define an anonymous CommonORBIT object by assigning proxies and
+   defining aspects. The arguments are not evaluated.
+   Symbols are proxies, lists are aspect definitions, a string is
+   documentation. Example:
+     (A "Female person" PERSON (SEX 'FEMALE))
+   Aspect definitions are processed as by DEFASPECT.
+
+ADD-TO-ASPECT  aspect-name object objects &optional type
+     [Function]
+   Add the given objects in an aspect for an object. The aspect type
+   may be :VALUE or :OBJECTS. It defaults to the right thing.
+
+ALL-ASPECT-NAMES  object
+     [Function]
+   Return a list of all aspect names for which definitions exist in
+   this object or can be retrieved by delegation.
+
+ALL-CLIENTS  proxy &rest object-lists
+     [Function]
+   Return all clients of the given proxy; if OBJECT-LISTS are given,
+   select only clients from the intersection of the given lists.
+
+ALL-NAMED-CLIENTS  proxy &rest object-lists
+     [Function]
+   Return all named clients of the given proxy; if OBJECT-LISTS are given,
+   select only clients from the intersection of the given lists.
+
+ALL-NAMED-PROXIES  object
+     [Function]
+   Retrieve a list of all named proxies of this object, and proxies of
+   their proxies recursively.
+
+ALL-PROXIES  object
+     [Function]
+   Retrieve a list of all proxies of this object, and proxies of proxies
+   recursively.
+
+ALL-SORTED-PROXIES  object
+     [Function]
+   Retrieve a list of all proxies of this object, and proxies of proxies
+   recursively, sorted according to the multiple delegation search
+   principles:
+   1. An object precedes its proxies.
+   2. The proxy added last comes first.
+   3. Local order of objects (as in the DEFOBJECT form) is preserved.
+
+AN  &rest proxies-and-aspects
+     [Macro]
+   Synonym of A.
+
+AND-DEFINED  &rest args
+     [Macro]
+   Same as AND but treats UNDEFINED similar to NIL. If an argument yields
+   NIL or UNDEFINED, then UNDEFINED is returned.
+
+ANONYMOUSP  object
+     [Function]
+   True if the argument is an anonymous CommonORBIT object, that is,
+   an object but not a named object.
+
+CLIENT-OF-MEMBER  client proxy-list
+     [Function]
+   True if the first argument is either a member of the proxy-list or a
+   client of a member.
+
+CLIENTP  client proxy
+     [Function]
+   True if the first argument is a client of the second.
+
+COMPILE-ASPECTS  &optional boolean
+     [Switch function]
+   Compile lambdas in aspect definitions with type :FUNCTION or
+   :IF-NEEDED, instead of making closures.
+
+DEFASPECT  aspect-name &optional object &body definition
+     [Macro]
+   Define an aspect. The aspect name is not evaluated. This macro is very
+   flexible. The following variants are possible.
+	DEFASPECT aspect
+   No definition is associated with any object.
+	DEFASPECT aspect :GLOBAL [([var ...]) form...]
+   The definition is installed as a global definition (see DEFUN-GLOBAL).
+	DEFASPECT aspect object [type] filler
+   The aspect definition is associated with the given object.
+        DEFASPECT (aspect ...) object [type] filler
+   Same, but the aspect indicates a path.
+
+   If the filler is a list and the aspect name ends on -S, The default
+   aspect type is :OBJECTS. If the filler is an object, the default is
+   :OBJECT. Otherwise it is :VALUE.
+   The following keywords for explicit aspect types are possible:
+	:VALUE filler
+   The filler can be any Lisp object which is simply to be returned.
+	:OBJECT filler
+   The filler is coerced to an object. A role is stored.
+	:OBJECTS filler
+   The filler is coerced to a list of objects. Roles are made for each
+   object.
+	:FUNCTION filler
+   or	:FUNCTION ([var ...]) form ...
+   The filler is a function which is to be applied. The filler is a
+   function with the given lambda list and forms.
+	:IF-NEEDED filler
+   or	:IF-NEEDED ([var ...]) form ...
+   Like :FUNCTION but the result is to be memoized.
+	:COPY other-object
+   The aspect type and filler are copied from another object. It is an
+   error if that object does not exist.
+	DEFASPECT aspect filler :OF object
+   The aspect type is :OBJECT. Note that filler and object are reversed.
+
+   After :FUNCTION or :IF-NEEDED, a second keyword may be specified.
+   Such a keyword may also be specified without :FUNCTION or :IF-NEEDED.
+   In the latter case a default determines the real aspect type.
+	:DELEGATE other-object
+   The aspect is delegated to another object, which may or may not exist.
+   (Default :FUNCTION).
+	:ADJOIN value
+   The value is added (with ADJOIN or UNION, depending on whether it is an
+   atom or not) to the result of delegating this aspect to the proxies.
+   (Default :IF-NEEDED).
+	:REMOVE value
+   The value is removed (with REMOVE or SET-DIFFERENCE, depending on
+   whether it is an atom or not) to the result of delegating this aspect
+   to the proxies.
+   (Default :IF-NEEDED).
+	:ASK [format-string] [read-form]
+   The filler is a format-string which is used to query the user. This
+   format string will be called with two arguments: the aspect name and
+   the object. The default format-string is "~&What is the ~A of ~A? ".
+   The default form for reading input is (READ *QUERY-IO*).
+   (Default :IF-NEEDED).
+        :SHARE aspect ...
+   The filler is a path which is followed from the object in which the
+   definition occurs.
+
+DEFFRAME  name &body proxies-and-aspects
+     [Macro]
+   Synonym of DEFOBJECT.
+
+DEFINEDP  thing
+     [Function]
+   If undefined then NIL, else the argument itself.
+
+DEFOBJECT  name &body proxies-and-aspects
+     [Macro]
+   Define a named CommonORBIT object by assigning proxies and defining
+   aspects. The arguments are not evaluated.
+   Symbols are proxies, lists are aspect definitions, a string is
+   documentation. Example:
+     (DEFOBJECT WOMAN "Female person" PERSON (SEX 'FEMALE))
+   Aspect definitions are processed as by DEFASPECT.
+
+DEFRAME  name &body proxies-and-aspects
+     [Macro]
+   Synonym of DEFOBJECT.
+
+DEFUN-GLOBAL  aspect-name parameter-list &body body
+     [Macro]
+   Define a global definition for a generic function. This is similar to
+   DEFUN, but allows the function to retain its generic definition.
+   Instead of a parameter list and body, a function may be specified,
+   which is then simply installed as the global definition.
+
+DELEGATE  (aspect proxy) &body arguments
+     [Macro]
+   Delegate an aspect to a proxy by looking up the intension of the aspect
+   for the proxy and then applying that closure to the given arguments.
+   The first of those arguments is normally an object, just like the
+   arguments of a generic function application.
+
+DELETE-FROM-ASPECT  aspect-name object objects &optional type
+     [Function]
+   Delete the given objects in an aspect for an object. The aspect
+   type may be :VALUE or :OBJECTS. It defaults to the right thing.
+
+DETECT-INFINITE-LOOPS  &optional boolean
+     [Switch function]
+   Keep a stack to detect infinite loops. If upon entry of a generic
+   function application, an object and its arguments are already on the
+   stack, then UNDEFINED is immediately returned. This allows working
+   with circular definitions.
+
+DETECTING-INFINITE-LOOPS  &rest forms
+     [Macro]
+   Evaluate the forms while temporarily detecting infinite loops. See the
+   switch DETECT-INFINITE-LOOPS.
+
+FIRST-IF-NEEDED  thing
+     [Function]
+   Take first element of argument if a list of one element, otherwise the
+   argument itself.
+
+HAS-ROLE-P  object role-object role-name
+     [Function]
+   True if the object has the given role in role-object.
+
+IF-DEFINED  condition trueclause &optional (falseclause undefined)
+     [Macro]
+   Same as IF but treats UNDEFINED similar to NIL.
+
+INHERIT  &rest args
+     [Macro]
+   Synonym of DELEGATE.
+
+INSTANTIATE-OBJECTS  objects
+     [Function]
+   Make a list of anonymous clients from a list of objects. Useful
+   because there is no structured delegation yet for type :OBJECTS.
+
+INTENSION  aspect-name object &rest args
+     [Function]
+   Return two values:
+   1. The definition of the aspect for the object as a closure. This
+   closure can e.g. be applied to the object (and more arguments when
+   appropriate).
+   2. The proxy providing the definition, or NIL if the definition was not
+   obtained by delegation.
+   Any &REST arguments are ignored.
+
+IS-CLIENT  client proxy
+     [Function]
+   Establish a client-proxy relation. The client will then by default
+   delegate all aspects to the proxy. Maybe prune the specialization
+   hierarchy if *PRUNE-PROXIES* is on.
+
+IS-LIKE  client proxy
+     [Function]
+   Synonym of IS-CLIENT.
+
+IS-LIKE-P  client proxy
+     [Function]
+   Synonym of CLIENTP.
+
+IS-LIKE?  client proxy
+     [Function]
+   Synonym of CLIENTP.
+
+IS-NO-CLIENT  client proxy
+     [Function]
+   Delete proxy from this client's proxies. However, the client may still
+   delegate to the proxy indirectly via another proxy.
+
+IS-NO-PROXY  proxy client
+     [Function]
+   Inverse of IS-NO-CLIENT.
+
+IS-PROXY  proxy client
+     [Function]
+   Inverse of IS-CLIENT.
+
+ISA  client proxy
+     [Function]
+   Synonym of IS-CLIENT.
+
+ISA?  client proxy
+     [Function]
+   Synonym of CLIENTP.
+
+ISAP  client proxy
+     [Function]
+   Synonym of CLIENTP.
+
+KILL-OBJECT  object
+     [Function]
+   Undo all pointers to this object as far as possible in order to
+   virtually annihilate it.
+
+LET-DEFINED  bindings &body body
+     [Macro]
+   Like LET, but returns UNDEFINED without executing the body forms if one
+   of the bindings is undefined.
+
+LIST-DEFINED  &rest rest
+     [Function]
+   Return a list of its arguments without any occurrences of UNDEFINED.
+
+LIST-IF-NEEDED  thing
+     [Function]
+   NIL if the argument is UNDEFINED, the argument itself if it is a list,
+   else a list containing the argument.
+
+MAKE-ANONYMOUS-CLIENT  proxy
+     [Function]
+   Return an anonymous client of the given object.
+
+MAKE-NAMED-REFERENCE  object name
+     [Function]
+   Create a new named object which gets the same referent as the given
+   object.
+
+MAKE-REFERENCE  object
+     [Function]
+   Create a new object which gets the same referent as the given
+   object.
+
+MEMOIZE-ASPECTS  &optional boolean
+     [Switch function]
+   Store values retrieved by delegation.
+
+NAME-OR-OBJECT  object
+     [Function]
+   Return the name if the argument is a named object, or the object itself
+   if it is an anonymous object, or NIL if it is not an object at all.
+
+NAMED-CLIENTS  proxy
+     [Function]
+   Return the named clients of the given proxy.
+
+NAMED-OBJECT  :name
+     [Structure]
+   Named CommonORBIT object. Such an object not only has a referent, but
+   also a name, which must be a non-NIL symbol.
+   This structure includes OBJECT.
+   The structure print function is PRESENT-NAMED-OBJECT.
+
+NOT-DEFINED  form
+     [Macro]
+   If form is NIL or UNDEFINED then true else NIL.
+
+OBJECT  :referent
+     [Structure]
+   CommonORBIT object. Each object has a referent. The referent is an
+   internal structure which contains all information (except the name
+   of a named object).
+   The structure predicate is OBJECTP.
+   The structure print function is PRESENT-ANONYMOUS-OBJECT.
+
+OBJECT  object
+     [Function]
+   Coerce the argument to a CommonORBIT object, if possible, otherwise
+   return NIL. The argument may be an object or a symbol which is the name
+   of an existing object. Can also be used as a predicate to check whether
+   the argument is either an object or the name of one.
+
+OBJECT-CLIENTS  object
+     [Macro]
+   The clients of an object (a list).
+
+OBJECT-DOCUMENTATION  object
+     [Macro]
+   The documentation string of an object.
+
+OBJECT-FBOUNDP  aspect-name
+     [Macro]
+   True if the argument, a symbol, is the name of a generic CommonORBIT
+   function.
+
+OBJECT-NAME  object
+     [Function]
+   Return the name (a symbol) of the argument (a CommonORBIT object).
+   If the argument is no CommonORBIT object, NIL is returned.
+
+OBJECT-PROXIES  object
+     [Macro]
+   The proxies of an object (a list).
+
+OBJECT-STRING  object
+     [Function]
+   Coerce the argument to a string. Like STRING, but if the argument is a
+   named CommonORBIT object, the symbol-name of the object name is used.
+
+OEQL  object1 object2
+     [Function]
+   This is an extension of EQL which also works for conceptual equality
+   of CommonORBIT objects. For objects, this predicate is the same as OQL.
+   If the arguments are no CommonORBIT objects, EQL is used.
+
+ONLY-NAME  &optional boolean
+     [Switch function]
+   Print a named object by just printing its name.
+
+OQL  object1 object2
+     [Function]
+   Conceptual equality of CommonORBIT objects: two objects are considered
+   equal if their referents are EQ. This is because different objects may
+   have the same referent.
+
+OR-DEFINED  &rest args
+     [Macro]
+   Same as OR but treats UNDEFINED similar to NIL. If none of the
+   arguments yields a non-NIL or non-UNDEFINED value, then UNDEFINED is
+   returned.
+
+PATH  object &rest aspects
+     [Macro]
+   Find or make the objects in a path, return the last object. The aspect
+   names are not evaluated. Example:
+   (PATH 'MARIA NEIGHBOR CAT) is like (CAT (NEIGHBOR 'MARIA)) except that
+   if any step in the path is UNDEFINED, an anonymous object is created
+   and stored.
+
+POP-ASPECT  (aspect-name object) &optional type
+     [Macro]
+   Similar to POP. The aspect filler becomes the REST of the evaluation
+   of (ASPECT-NAME OBJECT). The aspect type may be :VALUE or :OBJECTS.
+   It defaults to the right thing.
+
+PRESENT-OBJECT  object &optional (output-stream *standard-output*) memory
+     [Function]
+   Present object. Dispatch according to named or not.
+
+PROXY-OF-MEMBER  proxy client-list
+     [Function]
+   True if the first argument is either a member of the client-list or a
+   proxy of a member.
+
+PROXYP  proxy client
+     [Function]
+   True if the first argument is a proxy of the second.
+
+PRUNE-PROXIES  &optional boolean
+     [Switch function]
+   Prune the specialization hierarchy whenever appropriate. More
+   specifically, if an attempt is made to make an object P a proxy of an
+   objerct C, but P is already an ancestor of C, then nothing is done;
+   also, if C has a proxy which is an ancestor of P, then that proxy is
+   deleted from C, so that superfluous relations in the specialization
+   hierarchy are pruned. This enables a more efficient search. But note
+   that it may cause unexpected behavior if proxy P is later removed,
+   because once pruned, proxies are not automatically added again.
+
+PUSH-ASPECT  value (aspect-name object) &optional type
+     [Macro]
+   Similar to PUSH. The value is added to the result of the evaluation of
+   (ASPECT-NAME OBJECT), and this list is stored in the object. The aspect
+   type may be :VALUE or :OBJECTS. It defaults to the right thing.
+
+PUSHNEW-ASPECT  value (aspect-name object) &optional type
+     [Macro]
+   Similar to PUSHNEW. The value is added to the result of the evaluation
+   of (ASPECT-NAME OBJECT), but only if not already a member, and the
+   resulting list is stored in the object. The aspect type may be
+   :VALUE or :OBJECTS. It defaults to the right thing.
+
+REINITIALIZE-OBJECTS  &optional boolean
+     [Switch function]
+   Reinitialize a named object when processing a DEFOBJECT form, rather
+   than just adding proxies and aspect definitions. This destroys the
+   proxies, aspects, dependencies and memos of the object. The name,
+   roles and clients are kept.
+
+ROLE-NAMES  object &optional (role-object undefined)
+     [Function]
+   Return a list of names of roles which the object has in the
+   role-object. If the role-object is UNDEFINED or not given, all role
+   names of the object in any other objects are returned.
+
+SELECT-ALL-CLIENTS  proxy &body tests
+     [Macro]
+   Find all clients of a proxy which satisfy all given tests.
+   Each test has the form
+	(predicate aspect value [keyword ...])
+   where the predicate is used to compare the aspect of each
+   possible client with the given value. Example:
+	(SELECT-ALL-CLIENTS 'WOMAN
+	   (CLIENTP IDENTITY (OBJECT 'DOCTOR))
+	   (MEMBER BIRTHYEAR '(1950 1960) :TEST #'=))
+   selects all women whose birthyear is either 1950 or 1960.
+   Paths of aspects are also possible:
+	(MEMBER (WIFE BIRTHYEAR) '(1950 1960) :TEST #'=)
+   The aspect (or path of aspects) is not evaluated.
+
+SETASPECT  aspect-name object filler &optional type
+     [Function]
+   Define an aspect in an object. The aspect name is evaluated.
+   The object must be a real object, not a name.
+   The type can be :VALUE, :OBJECT, :OBJECTS, or NIL (which defaults to
+   the right thing).
+
+SHOW  object &optional (output-stream *standard-output*)
+     [Function]
+   Display a description of the object to the output stream.
+   The name (if named), proxies, roles, and aspect definitions are shown.
+
+SHOW-SWITCHES  &optional (output-stream *standard-output*)
+     [Function]
+   Show the current settings of all CommonORBIT switches.
+
+THE-NAMED-OBJECT  object-name
+     [Function]
+   Find or create a named object with the given name, which must be
+   a symbol. If the argument is NIL, UNDEFINED or not a symbol,
+   then an error is signaled.
+
+THE-OBJECT  object
+     [Function]
+   Coerce the argument to a CommonORBIT object. If it is already an object,
+   return it; if it is a symbol, find or create the associated object.
+
+UNDEFASPECT  aspect-name object
+     [Function]
+   Delete an aspect definition in an object.
+
+UNDEFINED 
+     [Parameter]
+   The value returned from an object-oriented function call
+   when the aspect is not defined for the object.
+
+UNDEFINEDP  thing
+     [Function]
+   True if the argument is undefined, i.e. EQ to UNDEFINED.
+
+UPDATE-MEMOS  &optional boolean
+     [Switch function]
+   Update memoized information after change. Works for delegated
+   information which is memoized as well as for stored results of
+   :IF-NEEDED expressions.
+
+WHERE  object = &rest path
+     [Macro]
+   Perform reverse evaluation, return the first object for which the
+   aspect is defined as the given object with type :OBJECT.
+   If more than one aspect is given, they are interpreted as a path.
+   Aspects are not evaluated. Example:
+   (WHERE SELF = FRIEND HUSBAND) == (FIRST (WHOSE 'FRIEND 'HUSBAND SELF))
+   Note that the = is just syntactic sugar.
+
+WHOSE  aspect aspect-or-object &rest more-aspects-or-object
+     [Function]
+   Perform reverse evaluation, return a list of those objects for which
+   the aspect is defined as the given object (with type :OBJECT).
+   If more than one aspect is given, they are interpreted as a path.
+   Aspects are evaluated. Example:
+   (DEFOBJECT PAUL (FRIEND :OBJECT 'MARY)) => #<object PAUL>
+   (DEFOBJECT DAVID (FRIEND :OBJECT 'MARY)) => #<object DAVID>
+   (WHOSE 'FRIEND 'MARY) => (#<object DAVID> #<object PAUL>)
+
+WITH  &rest args
+     [Macro]
+   Synonym of WHOSE.

@@ -1,0 +1,56 @@
+CommonORBIT is an object-oriented extension of Common LISP developed
+by Koenraad De Smedt.  The system consists of the following files:
+
+- corbit.lisp (< 83K)
+
+This file of Lisp code is basically all you need.  It should be
+compiled on any system conforming to CLtL 2.  It does not use CLOS.
+Load the compiled file and don't forget to do (use-package 'corbit).
+
+- corbit.docl (< 20K)
+
+This is a documentation file.  Further information can be obtained
+from the following book chapter:
+
+De Smedt, K. 1987. Object-oriented programming in Flavors and
+CommonORBIT. In: Hawley, R. (ed.)  Artificial Intelligence Programming
+Environments, pp.  157-176.  Chichester: Ellis Horwood.
+
+This chapter is slightly outdated, but it explains the main
+principles well.
+
+- tests.lisp (< 4K)
+
+This file contains a few tests that demonstrate some capabilities.
+
+- presentation.lisp (< 8K)
+
+This file contains Symbolics Common Lisp code to present and
+manipulate graphical representations of objects in Dynamic Windows
+under Genera.  It should be relatively simple to modify this file to
+make it work for CLIM.  I haven't gotten around to doing this yet, but
+I'd be delighted if someone wants to work on it.
+
+
+Please read the copyright notice and the disclaimer in the code.
+CommonORBIT is an experimental academic system and not a commercially
+supported software product.  This means that the system is not
+guaranteed to work in any way and that support is limited.  You can
+play with the CommonORBIT system as much as you like, as long as you
+are not selling the system itself, and if you are also willing to keep
+me informed about your extensions and applications.  Do not hesitate
+to send any comments or suggestions.
+
+I am currently (Jan. 1993) not planning to undertake any substantial
+work on the system, because I simply don't have time.  I have given
+thought to a few straightforward modifications, e.g. implementation on
+top of CLOS, design of a user-interface tool a la Flavor Examiner, and
+modification of the structured inheritance capability.  There has been
+a study on the latter, but it has not been fully tested.
+
+There is also a simplified version of CORBIT which is called BOOPS
+(Beginner's Object-Oriented Programming System).  It is very small,
+efficient and simple and intended for classroom use.
+
+Koenraad de Smedt  (Leiden University)
+
