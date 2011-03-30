@@ -3,7 +3,7 @@
 ;;; Copyright (c) 1992,1991,1990,1989,1988 Koenraad De Smedt
 
 ;;;   Koenraad De Smedt
-;;;   Unit of Experimental and Theoretical Psychology 
+;;;   Unit of Experimental and Theoretical Psychology
 ;;;   Leiden University
 ;;;   P.O. Box 9555
 ;;;   2300 RB  Leiden
@@ -41,115 +41,14 @@
 
 ;;; This module contains the kernel, which may be everything you need.
 
-(PROVIDE "CORBIT")
-
-(defpackage "CORBIT"
-  (:use "COMMON-LISP")
-  (:export
-   "<<"
-   ">>"
-   "A"
-   "ADD-TO-ASPECT"
-   "ALL-ASPECT-NAMES"
-   "ALL-CLIENTS"
-   "ALL-NAMED-CLIENTS"
-   "ALL-NAMED-PROXIES"
-   "ALL-PROXIES"
-   "ALL-SORTED-PROXIES"
-   "AN"
-   "AND-DEFINED"
-   "ANONYMOUSP"
-   "CLIENT-OF-MEMBER"
-   "CLIENTP"
-   "COMPILE-ASPECTS"
-   "COPY-NAMED-OBJECT"
-   "COPY-OBJECT"
-   "DEFASPECT"
-   "DEFFRAME"
-   "DEFINEDP"
-   "DEFOBJECT"
-   "DEFRAME"
-   "DEFUN-GLOBAL"
-   "DELEGATE"
-   "DELETE-FROM-ASPECT"
-   "DETECT-INFINITE-LOOPS"
-   "DETECTING-INFINITE-LOOPS"
-   "FIRST-IF-NEEDED"
-   "HAS-ROLE-P"
-   "IF-DEFINED"
-   "INHERIT"
-   "INSTANTIATE-OBJECTS"
-   "INTENSION"
-   "IS-CLIENT"
-   "IS-LIKE"
-   "IS-LIKE-P"
-   "IS-LIKE?"
-   "IS-NO-CLIENT"
-   "IS-NO-PROXY"
-   "IS-PROXY"
-   "ISA"
-   "ISA?"
-   "ISAP"
-   "KILL-OBJECT"
-   "LET-DEFINED"
-   "LIST-DEFINED"
-   "LIST-IF-NEEDED"
-   "MAKE-ANONYMOUS-CLIENT"
-   "MAKE-NAMED-REFERENCE"
-   "MAKE-OBJECT"
-   "MAKE-REFERENCE"
-   "MEMOIZE-ASPECTS"
-   "NAME-OR-OBJECT"
-   "NAMED-CLIENTS"
-   "NAMED-OBJECT"
-   "NAMED-OBJECT-NAME"
-   "NAMED-OBJECT-P"
-   "NOT-DEFINED"
-   "OBJECT"
-   "OBJECT"
-   "OBJECT-CLIENTS"
-   "OBJECT-DOCUMENTATION"
-   "OBJECT-FBOUNDP"
-   "OBJECT-NAME"
-   "OBJECT-PROXIES"
-   "OBJECT-REFERENT"
-   "OBJECT-STRING"
-   "OBJECTP"
-   "OEQL"
-   "ONLY-NAME"
-   "OQL"
-   "OR-DEFINED"
-   "PATH"
-   "POP-ASPECT"
-   "PRESENT-OBJECT"
-   "PROXY-OF-MEMBER"
-   "PROXYP"
-   "PRUNE-PROXIES"
-   "PUSH-ASPECT"
-   "PUSHNEW-ASPECT"
-   "REINITIALIZE-OBJECTS"
-   "ROLE-NAMES"
-   "SELECT-ALL-CLIENTS"
-   "SETASPECT"
-   "SHOW"
-   "SHOW-SWITCHES"
-   "THE-NAMED-OBJECT"
-   "THE-OBJECT"
-   "UNDEFASPECT"
-   "UNDEFINED"
-   "UNDEFINEDP"
-   "UPDATE-MEMOS"
-   "WHERE"
-   "WHOSE"
-   "WITH"
-   ))
-
 (IN-PACKAGE "CORBIT")
 
 ;;; ----- Constants and variables -----
 
 ;;; constants
-(DEFCONSTANT *VERSION* "CLtL 2, 30 September 1992")
+(DEFCONSTANT +VERSION+
+  (IF (BOUNDP '+VERSION+) (SYMBOL-VALUE '+VERSION+)
+      "CLtL 2, 30 September 1992"))
 
 ;;; parameters
 (DEFPARAMETER *SWITCHES* NIL "A list of all CommonORBIT switches.")
@@ -189,7 +88,7 @@
 
 (WHEN *LOAD-VERBOSE*
   (FORMAT T "~&CommonORBIT  ~A  running in ~A."
-	  *VERSION* (LISP-IMPLEMENTATION-TYPE)))
+	  +VERSION+ (LISP-IMPLEMENTATION-TYPE)))
 
 ;;; ----- Plural aspect names -----
 
@@ -253,7 +152,7 @@
 ;;; ----- Basic structures and access -----
 
 ;;; An object is a two-level structure. The first level is a structure
-;;; (a reference) which contains a pointer to the second level. 
+;;; (a reference) which contains a pointer to the second level.
 ;;; In addition, the first level of a named object contains the name.
 ;;; (reference by name :-)
 ;;; The second level is a structure which is called the referent of the
@@ -622,7 +521,7 @@
 	    (PRESENT-OBJECTS (OBJECT-PROXIES OBJ) OUTPUT-STREAM (LIST OBJ))
 	    (PRINC "." OUTPUT-STREAM))
 	  ;; print role-objects for each role-name
-	  (DOLIST (ROLE (OBJECT-ROLES OBJ)) 
+	  (DOLIST (ROLE (OBJECT-ROLES OBJ))
 	    (FORMAT OUTPUT-STREAM "~% It is ~S of" (ROLE-NAME ROLE))
 	    (PRESENT-OBJECTS (ROLE-OBJECTS ROLE) OUTPUT-STREAM (LIST OBJ))
 	    (PRINC "." OUTPUT-STREAM))
@@ -936,7 +835,7 @@
 	       ((ENDP OBJECTS) RESULT))
 	   ;; no objects are given, simply give all clients of proxy
 	   (DO ((SERIES (OBJECT-CLIENTS PROXY)
-			(APPEND (REST SERIES) 
+			(APPEND (REST SERIES)
 				(OBJECT-CLIENTS (FIRST SERIES))))
 		(RESULT NIL (ADJOIN (FIRST SERIES) RESULT)))
 	       ((ENDP SERIES) (REVERSE RESULT))))))
@@ -1837,7 +1736,6 @@
 
 (DEFUN EXPAND-SHARE (ASPECT-NAME SHARE-PATH OBJECT-PATH)
   "Expansion for :SHARE in DEFASPECT."
-  (DECLARE (IGNORE OBJECT))
   `#'(LAMBDA (SELF)
        (PATH (WHERE SELF = ,@(BUTLAST OBJECT-PATH))
 	     ,@SHARE-PATH ,(SECOND ASPECT-NAME))))
@@ -2260,7 +2158,7 @@
 	 ;; collect those satisfying the tests
 	 (WHEN (AND
 		 ,@(MAPCAR
-		     #'(LAMBDA (TEST) 
+		     #'(LAMBDA (TEST)
 			 `(,(FIRST TEST)	;the test function
 			   ;; the first argument
 			   ,(IF (ATOM (SECOND TEST))	;not a path?
@@ -2318,7 +2216,7 @@
 
 (DEFMACRO DETECTING-INFINITE-LOOPS (&REST FORMS)
   "Evaluate the forms while temporarily detecting infinite loops. See the
-   switch DETECT-INFINITE-LOOPS." 
+   switch DETECT-INFINITE-LOOPS."
   `(LET ((*DETECT-INFINITE-LOOPS* T))
      ,@FORMS))
 
