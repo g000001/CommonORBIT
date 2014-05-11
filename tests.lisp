@@ -2,11 +2,9 @@
 
 ;;; some tests for CORBIT
 
-(PROVIDE "CORBIT-DEMO")
-(IN-PACKAGE "CL-USER")
+#|(PROVIDE "CORBIT-DEMO")|#
+(IN-PACKAGE "CORBIT-TEST")
 
-(REQUIRE "CORBIT")
-(USE-PACKAGE "CORBIT")
 
 ;;; helper function
 
@@ -153,3 +151,5 @@
     (PRINT TEST)
     (PRINC "=>")
     (PRINT (EVAL TEST))))
+
+(test-corbit)

@@ -99,3 +99,6 @@
    "WITH"
    ))
 
+
+(cl:defpackage "CORBIT-TEST"
+  (:use "CL" "CORBIT"))
